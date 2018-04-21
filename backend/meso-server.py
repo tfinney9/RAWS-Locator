@@ -4,6 +4,9 @@
 Created on Mon Mar 26 16:16:50 2018
 
 @author: tanner
+
+
+Backend Run Script for RAWS-Locator
 """
 
 import mwlatest
@@ -26,7 +29,7 @@ limits={'temp':0,'spd':0,'dir':0,'rain':0,'rh':100,'gust':0}
 
 #tDir='/home/tanner/src/nu-weather/nuwx/data/'
 #tDir='/home/tfinney/src/nuwx/data/'
-tDir='/srv/shiny-server/weather/data/'
+tDir='/srv/shiny-server/raws/data/'
 
 tFile=tDir+'nu-'+str(int(time.time()))+'.csv'
 

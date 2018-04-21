@@ -5,9 +5,14 @@ library(shinyjs)
 #inputFile<-"/home/tanner/src/nu-weather/nuwx/data/"
 #runPath<-"/home/tanner/src/nu-weather/nuwx/backend/meso-server.py"
 
-inputFile<-"/home/tfinney/src/nuwx/data/"
-runPath<-"/home/tfinney/src/nuwx/backend/meso-server.py"
-locData<-read.csv(file="/home/tfinney/src/nuwx/backend/loc.csv")
+#inputFile<-"/home/tfinney/src/nuwx/data/"
+#runPath<-"/home/tfinney/src/nuwx/backend/meso-server.py"
+#locData<-read.csv(file="/home/tfinney/src/nuwx/backend/loc.csv")
+
+inputFile<-"/home/ubuntu/src/nuwx/data/"
+runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py"
+locData<-read.csv(file="/home/ubuntu/src/nuwx/backend/loc.csv")
+
 
 shinyServer(function(input, output) {
   useShinyjs()
