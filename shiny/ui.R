@@ -22,7 +22,8 @@ jsCode<-'shinyjs.func = function(){ navigator.geolocation.getCurrentPosition(onS
 shinyUI(fluidPage(theme=shinytheme("united"),
   useShinyjs(),
   extendShinyjs(text=jsCode,functions=c("func")),  
-  titlePanel("Best Weather Site Ever!"),
+  titlePanel("RAWS Locator"),
+  h3("Finds Weather Stations Near You"),
   # fluidRow(
     # column(12,
     # actionButton("run_app",label="Go!"))

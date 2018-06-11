@@ -14,7 +14,7 @@ runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py"
 locData<-read.csv(file="/home/ubuntu/src/nuwx/backend/loc.csv")
 
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output,session) {
   useShinyjs()
   # g<-Sys.glob(inputFile)
   #runFile<-"/home/tanner/src/nu-weather/nuwx/data/nu-1523231749.csv"
@@ -56,7 +56,60 @@ shinyServer(function(input, output) {
 
   output$glat<-renderPrint(paste('Lat:',input$geoLat,sep=" "))
   output$glon<-renderPrint(paste('Lon:',input$geoLon,sep=" "))
-  # 
+  
+  #
+  # Automatic Time Zone Detection Stuff
+  #
+  #punWrath<-"/home/tanner/src/src2/web_timeZoneFinder/tz-detector.py"
+  punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py"
+  observeEvent(input$locationType,{
+    if(input$locationType==1)
+    {
+      observeEvent({input$lat
+                    input$lon},{
+                      targs=paste("\"",input$lat,"\" \"",input$lon,"\"",sep="")
+                      #print(targs)
+                      tz_check<-system2(command=punWrath,args=targs,stdout = TRUE)
+                      #print(tz_check)
+                      updateSelectInput(session,"timeZone",selected=tz_check)
+                      
+                    })
+    }
+    if(input$locationType==2)
+    {
+      observeEvent({
+        input$geoLat
+        input$geoLon
+      },{
+        targs=paste("\"",input$geoLat,"\" \"",input$geoLon,"\"",sep="")
+        #print(targs)
+        tz_check<-system2(command=punWrath,args=targs,stdout = TRUE)
+        #print(tz_check)
+        #updateSelectInput(session,"timeZone",selected=tz_check)
+      })
+    }
+    if(input$locationType==3)
+    {
+      #print("type:3")
+      observeEvent(input$Location,{
+        #print("locChanged")
+        naLoc<-match(input$Location,locData[[1]])
+        fiLat<-locData[[2]][naLoc]
+        fiLon<-locData[[3]][naLoc]
+    
+        targs=paste("\"",fiLat,"\" \"",fiLon,"\"",sep="")
+        #print(targs)
+        tz_check<-system2(command=punWrath,args=targs,stdout = TRUE)
+        #print(tz_check)
+        updateSelectInput(session,"timeZone",selected=tz_check)
+        
+      })
+    }
+  })
+  #
+  #End Automatic Time Zone Detection stuff
+  #
+
 
   observeEvent(input$Location,{
     nLoc<-match(input$Location,locData[[1]])
@@ -91,7 +144,7 @@ shinyServer(function(input, output) {
     runFile<-system2(command=runPath,args=gArgs,stdout = TRUE)
     print(runFile)
     tbl<-read.csv(runFile)
-    output$table<-renderDataTable(tbl)
+    output$table<-renderDataTable(tbl,escape=FALSE)
   })
   # observeEvent(input$run_app,{
   #   tbl<-read.csv(runFile)
