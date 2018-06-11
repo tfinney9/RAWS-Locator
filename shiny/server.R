@@ -1,13 +1,14 @@
 #NuWeather
 library(shiny)
 library(shinyjs)
+library(leaflet)
 
 #inputFile<-"/home/tanner/src/nu-weather/nuwx/data/"
 #runPath<-"/home/tanner/src/nu-weather/nuwx/backend/meso-server.py"
 
-#inputFile<-"/home/tfinney/src/nuwx/data/"
-#runPath<-"/home/tfinney/src/nuwx/backend/meso-server.py"
-#locData<-read.csv(file="/home/tfinney/src/nuwx/backend/loc.csv")
+#inputFile<-"/home/tanner/src/nu-weather/RAWS-Locator/shiny/data/"
+#runPath<-"/home/tanner/src/nu-weather/RAWS-Locator/backend/meso-server.py"
+#locData<-read.csv(file="/home/tanner/src/nu-weather/RAWS-Locator/backend/loc.csv")
 
 inputFile<-"/home/ubuntu/src/nuwx/data/"
 runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py"
@@ -60,8 +61,8 @@ shinyServer(function(input, output,session) {
   #
   # Automatic Time Zone Detection Stuff
   #
-  #punWrath<-"/home/tanner/src/src2/web_timeZoneFinder/tz-detector.py"
-  punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py"
+  punWrath<-"/home/tanner/src/src2/web_timeZoneFinder/tz-detector.py"
+  #punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py"
   observeEvent(input$locationType,{
     if(input$locationType==1)
     {
@@ -121,13 +122,19 @@ shinyServer(function(input, output,session) {
 
 
   observeEvent(input$run_app,{
+    xLat<-""
+    xLon<-""
     if(input$locationType==1)
     {
       gArgs=paste("\"",input$lat,"\" \"",input$lon,"\" \"",input$radius,"\" \"",input$timeZone,"\"",sep="")
+      xLat<-input$lat
+      xLon<-input$lon
     }
     if(input$locationType==2)
     {
       gArgs=paste("\"",input$geoLat,"\" \"",input$geoLon,"\" \"",input$radius,"\" \"",input$timeZone,"\"",sep="")
+      xLat<-input$geoLat
+      xLon<-input$geoLon
       print(gArgs)
     }
     if(input$locationType==3)
@@ -139,12 +146,56 @@ shinyServer(function(input, output,session) {
       fiLon<-locData[[3]][naLoc]
       print(fiLat)
       print(fiLon)
+      xLat<-fiLat
+      xLon<-fiLon
       gArgs=paste("\"",fiLat,"\" \"",fiLon,"\" \"",input$radius,"\" \"",input$timeZone,"\"",sep="")
     }
     runFile<-system2(command=runPath,args=gArgs,stdout = TRUE)
     print(runFile)
     tbl<-read.csv(runFile)
     output$table<-renderDataTable(tbl,escape=FALSE)
+    
+    ds<-read.csv(runFile)
+    
+    latList<-ds[11]
+    lonList<-ds[12]
+    nameList<-ds[2]
+    urlList<-ds[1]
+    temp_List<-ds[3]
+    spd_List<-ds[4]
+    dir_List<-ds[5]
+    rh_List<-ds[6]
+    dist_List<-ds[7]
+    hdg_List<-ds[8]
+    date_list<-ds[9]
+    time_List<-ds[10]
+    
+    i=1
+    test<-paste("Name:",urlList[[i]],
+                "<br/>ID:",nameList[[i]],
+                "<br/>Temp(F):",temp_List[[i]],
+                "<br/>Wind Speed(mph):",spd_List[[i]],
+                "<br/>Wind Direction:",dir_List[[i]],
+                "<br/>Relative Humidity:",rh_List[[i]],
+                "<br/>Distance(mi):",dist_List[[i]],
+                "<br/>Heading:",hdg_List[[i]],
+                "<br/>Date:",date_list[[i]],
+                "<br/>Time:",time_List[[i]],
+                "<br/>Latitude:",latList[[i]],
+                "<br/>Longitude:",lonList[[i]])
+    
+    output$l_map <- renderLeaflet({
+      leaflet() %>%
+        addProviderTiles(providers$Stamen.Terrain,
+                         options = providerTileOptions(noWrap = TRUE)
+        ) %>%
+        addMarkers(lonList[[1]],latList[[1]],popup=test) %>%
+        addCircleMarkers(xLon,xLat,popup="Entered Location",color="red")
+    })
+    
+    
+    
+    
   })
   # observeEvent(input$run_app,{
   #   tbl<-read.csv(runFile)

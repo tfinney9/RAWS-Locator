@@ -1,6 +1,7 @@
 library(shiny)
 library(shinyjs)
 library(shinythemes)
+library(leaflet)
 
 jsCode<-'shinyjs.func = function(){ navigator.geolocation.getCurrentPosition(onSuccess, onError);
                                       function onError (err) {
@@ -52,12 +53,18 @@ shinyUI(fluidPage(theme=shinytheme("united"),
            actionButton("run_app",label="Go!",class="btn-primary")
     )),
   fluidRow(br()),
-
-  fluidRow(
-  column(12,
-    dataTableOutput("table")
-  ))
   
-  
+  tabsetPanel(type="tabs",
+              tabPanel("Table",dataTableOutput("table")),
+              tabPanel("Map",leafletOutput("l_map"))),
+  br()
+  # fluidRow(
+  # column(12,
+  #   dataTableOutput("table")
+  # )),
+  # fluidRow(
+  #   column(12,
+  #          leafletOutput("l_map")
+  #   ))
   
   ))
