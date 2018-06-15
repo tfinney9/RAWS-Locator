@@ -56,7 +56,7 @@ shinyUI(fluidPage(theme=shinytheme("united"),
   
   tabsetPanel(type="tabs",
               tabPanel("Table",dataTableOutput("table")),
-              tabPanel("Map",leafletOutput("l_map"))),
+              tabPanel("Map",leafletOutput("l_map",height=600))),
   br()
   # fluidRow(
   # column(12,

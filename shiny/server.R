@@ -10,7 +10,7 @@ library(leaflet)
 #runPath<-"/home/tanner/src/nu-weather/RAWS-Locator/backend/meso-server.py"
 #locData<-read.csv(file="/home/tanner/src/nu-weather/RAWS-Locator/backend/loc.csv")
 
-inputFile<-"/home/ubuntu/src/nuwx/data/"
+inputFile<-"/home/ubuntu/src/nuwx/shiny/data/"
 runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py"
 locData<-read.csv(file="/home/ubuntu/src/nuwx/backend/loc.csv")
 
@@ -61,8 +61,8 @@ shinyServer(function(input, output,session) {
   #
   # Automatic Time Zone Detection Stuff
   #
-  punWrath<-"/home/tanner/src/src2/web_timeZoneFinder/tz-detector.py"
-  #punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py"
+  #punWrath<-"/home/tanner/src/src2/web_timeZoneFinder/tz-detector.py"
+  punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py"
   observeEvent(input$locationType,{
     if(input$locationType==1)
     {
