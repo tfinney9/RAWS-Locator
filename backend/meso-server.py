@@ -14,6 +14,7 @@ import station
 import createAlert
 import time
 import sys
+import getpass
 
 #Location=[45.668,-111.0598]
 #Location=[38.5449,-121.7405]
@@ -24,9 +25,14 @@ numLimit=[0]
 unitLimits={'temp':'Farenheit','tempABV':'F','spd':'miles_per_hour','spdABV':'mph'}
 limits={'temp':0,'spd':0,'dir':0,'rain':0,'rh':100,'gust':0}
 
-#tDir='/home/tanner/src/nu-weather/nuwx/data/'
-#tDir='/home/tfinney/src/nuwx/data/'
-tDir='/srv/shiny-server/raws/data/'
+tDir=''
+
+if getpass.getuser()=='tanner':
+    tDir='/home/tanner/src/nu-weather/RAWS-Locator/shiny/data/'
+if getpass.getuser()=='ubuntu':
+    tDir='/srv/shiny-server/raws/data/'
+
+
 tFile=tDir+'nu-'+str(int(time.time()))+'.csv'
 
 def getRAWSData(Lat,Lon,Radius,limit,spdUnits,tempUnits):
@@ -85,18 +91,18 @@ def runNuWx(Lat,Lon,radius,tzId):
     #','+wxStations[i].cardinal+','+wxStations[i].date+','+wxStations[i].time+','+str(wxStations[i].lat)+','+str(wxStations[i].lon)
     if len(wxStations)>-1:
         with open(tFile,'wb') as f:
-            f.write('Name,ID,Temp (F),Wind Spd (mph),Wind Dir,Relative Humidity (%),Distance (mi),Heading,Date,Time,Lat,Lon\n')
+            f.write('Name,ID,Temp (F),Wind Spd (mph),Wind Gust(mph),Wind Dir,Relative Humidity (%),Distance (mi),Heading,Date,Time,Lat,Lon\n')
             for i in range(len(wxStations)):
                 fStr=str(wxStations[i].name)+','+wxStations[i].stid+','+str(wxStations[i].temperature)+\
-                ','+str(wxStations[i].wind_speed)+','+str(wxStations[i].wind_direction)+','+str(round(wxStations[i].rh,1))+','+str(round(wxStations[i].distance_from_point,1))+\
+                ','+str(wxStations[i].wind_speed)+','+str(wxStations[i].wind_gust)+','+str(wxStations[i].wind_direction)+','+str(round(wxStations[i].rh,1))+','+str(round(wxStations[i].distance_from_point,1))+\
                 ','+wxStations[i].cardinal+','+wxStations[i].date+','+wxStations[i].time+','+str(wxStations[i].lat)+\
                 ','+str(wxStations[i].lon)+'\n'
                 f.write(fStr)
             f.close()
     else:
         with open(tFile,'wb') as f:
-            f.write('Name,ID,Temp (F),Wind Spd (mph),Wind Dir,Distance (mi),Heading,Time,Date,Lat,Lon\n')
-            fStr='NAME,0,0,0,0,0,0,0,0,0,0\n'
+            f.write('Name,ID,Temp (F),Wind Spd (mph),Wind Gust(mph),Wind Dir,Distance (mi),Heading,Time,Date,Lat,Lon\n')
+            fStr='NAME,0,0,0,0,0,0,0,0,0,0,0\n'
             f.write(fStr)
             f.close()
             

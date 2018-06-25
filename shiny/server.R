@@ -3,17 +3,22 @@ library(shiny)
 library(shinyjs)
 library(leaflet)
 
-#inputFile<-"/home/tanner/src/nu-weather/nuwx/data/"
-#runPath<-"/home/tanner/src/nu-weather/nuwx/backend/meso-server.py"
 
-#inputFile<-"/home/tanner/src/nu-weather/RAWS-Locator/shiny/data/"
-#runPath<-"/home/tanner/src/nu-weather/RAWS-Locator/backend/meso-server.py"
-#locData<-read.csv(file="/home/tanner/src/nu-weather/RAWS-Locator/backend/loc.csv")
-
-inputFile<-"/home/ubuntu/src/nuwx/shiny/data/"
-runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py"
-locData<-read.csv(file="/home/ubuntu/src/nuwx/backend/loc.csv")
-
+if(Sys.getenv("USER")[1]=="ubuntu") #We Are Deploying this on the server
+{
+  inputFile<-"/home/ubuntu/src/nuwx/shiny/data/" #General Data Path
+  runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py" #Server File Locaiton
+  locData<-read.csv(file="/home/ubuntu/src/nuwx/backend/loc.csv") #File Location List
+  punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py" #Time zone detector file location
+  
+}
+if(Sys.getenv("USER")[1]=="tanner") #Development
+{
+  inputFile<-"/home/tanner/src/nu-weather/RAWS-Locator/shiny/data/"
+  runPath<-"/home/tanner/src/nu-weather/RAWS-Locator/backend/meso-server.py"
+  locData<-read.csv(file="/home/tanner/src/nu-weather/RAWS-Locator/backend/loc.csv")
+  punWrath<-"/home/tanner/src/src2/web_timeZoneFinder/tz-detector.py"
+}
 
 shinyServer(function(input, output,session) {
   useShinyjs()
@@ -61,8 +66,6 @@ shinyServer(function(input, output,session) {
   #
   # Automatic Time Zone Detection Stuff
   #
-  #punWrath<-"/home/tanner/src/src2/web_timeZoneFinder/tz-detector.py"
-  punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py"
   observeEvent(input$locationType,{
     if(input$locationType==1)
     {
@@ -157,24 +160,26 @@ shinyServer(function(input, output,session) {
     
     ds<-read.csv(runFile)
     
-    latList<-ds[11]
-    lonList<-ds[12]
-    nameList<-ds[2]
     urlList<-ds[1]
+    nameList<-ds[2]
     temp_List<-ds[3]
     spd_List<-ds[4]
-    dir_List<-ds[5]
-    rh_List<-ds[6]
-    dist_List<-ds[7]
-    hdg_List<-ds[8]
-    date_list<-ds[9]
-    time_List<-ds[10]
+    gust_List<-ds[5]
+    dir_List<-ds[6]
+    rh_List<-ds[7]
+    dist_List<-ds[8]
+    hdg_List<-ds[9]
+    date_list<-ds[10]
+    time_List<-ds[11]
+    latList<-ds[12]
+    lonList<-ds[13]
     
     i=1
     test<-paste("Name:",urlList[[i]],
                 "<br/>ID:",nameList[[i]],
                 "<br/>Temp(F):",temp_List[[i]],
                 "<br/>Wind Speed(mph):",spd_List[[i]],
+                "<br/>Wind Gust(mph):",gust_List[[i]],
                 "<br/>Wind Direction:",dir_List[[i]],
                 "<br/>Relative Humidity:",rh_List[[i]],
                 "<br/>Distance(mi):",dist_List[[i]],
