@@ -29,7 +29,7 @@ tDir=''
 
 if getpass.getuser()=='tanner':
     tDir='/home/tanner/src/nu-weather/RAWS-Locator/shiny/data/'
-if getpass.getuser()=='ubuntu':
+else:
     tDir='/srv/shiny-server/raws/data/'
 
 
