@@ -1,6 +1,7 @@
 library(shiny)
 library(shinyjs)
 library(shinythemes)
+#old branc
 
 jsCode<-'shinyjs.func = function(){ navigator.geolocation.getCurrentPosition(onSuccess, onError);
                                       function onError (err) {
