@@ -30,7 +30,7 @@ tDir=''
 if getpass.getuser()=='tanner':
     tDir='/home/tanner/src/nu-weather/RAWS-Locator/shiny/data/'
 else:
-    tDir='/srv/shiny-server/raws/data/'
+    tDir='/srv/shiny-server/raws/raws-table/data/'
 
 
 tFile=tDir+'nu-'+str(int(time.time()))+'.csv'
