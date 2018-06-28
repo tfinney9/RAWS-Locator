@@ -10,7 +10,7 @@ library(leaflet)
   runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py" #Server File Locaiton
   locData<-read.csv(file="/home/ubuntu/src/nuwx/backend/loc.csv") #File Location List
   punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py" #Time zone detector file location
-  
+  firePath<-"/home/ubuntu/fwas_data/NIFC/incidents.csv"
 #}
 if(Sys.getenv("USER")[1]=="tanner") #Development
 {
@@ -18,6 +18,7 @@ if(Sys.getenv("USER")[1]=="tanner") #Development
   runPath<-"/home/tanner/src/nu-weather/RAWS-Locator/backend/meso-server.py"
   locData<-read.csv(file="/home/tanner/src/nu-weather/RAWS-Locator/backend/loc.csv")
   punWrath<-"/home/tanner/src/src2/web_timeZoneFinder/tz-detector.py"
+  firePath<-"/media/tanner/vol2/NIFC/incidents.csv"
 }
 
 shinyServer(function(input, output,session) {
@@ -30,6 +31,9 @@ shinyServer(function(input, output,session) {
     if (is.null(input$locationType))
       return()
     
+    xfireData<-reactiveFileReader(1000,NULL,firePath,read.csv)
+    fireData<-xfireData()
+    
     switch(input$locationType,
            "1" = tagList(
              numericInput("lat", label = ("Enter Latitude (Decimal Degrees)"), value = 46.92,step=0.1),
@@ -38,12 +42,16 @@ shinyServer(function(input, output,session) {
              verbatimTextOutput("lonVal")),
            "2" = tagList(actionButton("locate","Allow Location Access",class="btn-primary"),br(),br(),verbatimTextOutput("glat"),verbatimTextOutput("glon")),
            "3" = tagList(
-             #div('NOTE: Selecting a Fire Location REPLACES the location set by a preset. Use \'Enter Lat/Lon\' if you want to use the preset location. ',style="color:blue"),
              hr(),selectInput('Location','Select Location',
                               c(Choose='',locData[1]),selectize=TRUE),br(),
+             verbatimTextOutput("bLat"),br(),
+             verbatimTextOutput("bLon")),
+           "4" = tagList(
+             hr(),selectInput('fire_name','Select Fire Location',
+                              c(Choose='',fireData[1]),selectize=TRUE),br(),
              verbatimTextOutput("fLat"),br(),
              verbatimTextOutput("fLon"))
-
+          
 
 
 
@@ -56,6 +64,16 @@ shinyServer(function(input, output,session) {
            #   verbatimTextOutput("fLon"))
            
     )
+  })
+  
+  observeEvent(input$fire_name,{
+    xfireData<-reactiveFileReader(1000,NULL,firePath,read.csv)
+    fireData<-xfireData()
+    nLoc<-match(input$fire_name,fireData[[1]])
+    output$fLat<-renderPrint(paste('Lat:',fireData[[3]][nLoc],sep=""))
+    output$fLon<-renderPrint(paste('Lon:',fireData[[2]][nLoc],sep=""))
+    #       fireLat<-renderPrint(fireData[[3]][nLoc])
+    #       fireLon<-renderPrint(fireData[[2]][nLoc])
   })
   
 
@@ -89,7 +107,7 @@ shinyServer(function(input, output,session) {
         #print(targs)
         tz_check<-system2(command=punWrath,args=targs,stdout = TRUE)
         #print(tz_check)
-        #updateSelectInput(session,"timeZone",selected=tz_check)
+        updateSelectInput(session,"timeZone",selected=tz_check)
       })
     }
     if(input$locationType==3)
@@ -98,9 +116,29 @@ shinyServer(function(input, output,session) {
       observeEvent(input$Location,{
         #print("locChanged")
         naLoc<-match(input$Location,locData[[1]])
-        fiLat<-locData[[2]][naLoc]
-        fiLon<-locData[[3]][naLoc]
+        biLat<-locData[[2]][naLoc]
+        biLon<-locData[[3]][naLoc]
     
+        targs=paste("\"",biLat,"\" \"",biLon,"\"",sep="")
+        #print(targs)
+        tz_check<-system2(command=punWrath,args=targs,stdout = TRUE)
+        #print(tz_check)
+        updateSelectInput(session,"timeZone",selected=tz_check)
+        
+      })
+    }
+    if(input$locationType==4)
+    {
+      observeEvent(input$Location,{
+        xfireData<-reactiveFileReader(1000,NULL,firePath,read.csv)
+        fireData<-xfireData()
+        nLoc<-match(input$fire_name,fireData[[1]])
+        fiLat<-fireData[[3]][nLoc]
+        fiLon<-fireData[[2]][nLoc]
+        
+        print(fiLat)
+        print(fiLon)
+        
         targs=paste("\"",fiLat,"\" \"",fiLon,"\"",sep="")
         #print(targs)
         tz_check<-system2(command=punWrath,args=targs,stdout = TRUE)
@@ -117,8 +155,8 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$Location,{
     nLoc<-match(input$Location,locData[[1]])
-    output$fLat<-renderPrint(paste('Lat:',locData[[2]][nLoc],sep=""))
-    output$fLon<-renderPrint(paste('Lon:',locData[[3]][nLoc],sep=""))
+    output$bLat<-renderPrint(paste('Lat:',locData[[2]][nLoc],sep=""))
+    output$bLon<-renderPrint(paste('Lon:',locData[[3]][nLoc],sep=""))
     #       fireLat<-renderPrint(fireData[[3]][nLoc])
     #       fireLon<-renderPrint(fireData[[2]][nLoc])
   })
@@ -145,8 +183,21 @@ shinyServer(function(input, output,session) {
       # print(input$geoLat)
       # print(input$geoLon)
       naLoc<-match(input$Location,locData[[1]])
-      fiLat<-locData[[2]][naLoc]
-      fiLon<-locData[[3]][naLoc]
+      biLat<-locData[[2]][naLoc]
+      biLon<-locData[[3]][naLoc]
+      print(biLat)
+      print(biLon)
+      xLat<-biLat
+      xLon<-biLon
+      gArgs=paste("\"",biLat,"\" \"",biLon,"\" \"",input$radius,"\" \"",input$timeZone,"\"",sep="")
+    }
+    if(input$locationType==4)
+    {
+      xfireData<-reactiveFileReader(1000,NULL,firePath,read.csv)
+      fireData<-xfireData()
+      nLoc<-match(input$fire_name,fireData[[1]])
+      fiLat<-fireData[[3]][nLoc]
+      fiLon<-fireData[[2]][nLoc]
       print(fiLat)
       print(fiLon)
       xLat<-fiLat

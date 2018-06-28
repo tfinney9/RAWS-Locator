@@ -33,7 +33,7 @@ shinyUI(fluidPage(theme=shinytheme("united"),
     fluidRow(
       column(5,wellPanel(radioButtons("locationType",label=("Location Options"),
                                       choices=list("Enter Lat/Lon"=1,"Use Your Location"=2,
-				      "Select Location"=3), 
+				      "Select Location"=3,"Large Fires"=4), 
                                       selected=1,inline=TRUE),uiOutput("location")
                          
                          )),
