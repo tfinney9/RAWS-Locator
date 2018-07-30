@@ -15,7 +15,7 @@ RAWS Locator
 import timezonefinder
 import sys
 
-tzID=[1,2,3,4,5,6]
+tzID=[1,2,3,4,5,6,7]
 tzName=['America/Los_Angeles','America/Denver','America/Phoenix','America/Chicago','America/New_York','Pacific/Honolulu','America/Anchorage']
 
 
