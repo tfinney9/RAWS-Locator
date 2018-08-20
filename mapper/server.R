@@ -9,21 +9,29 @@
 
 library(shiny)
 library(leaflet)
+library(raster)
+library(shinyBS)
 
-#if(Sys.getenv("USER")[1]=="ubuntu") #We Are Deploying this on the server
-#{
-  inputFile<-"/home/ubuntu/src/nuwx/shiny/data/" #General Data Path
-  runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py" #Server File Locaiton
-  punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py" #Time zone detector file location
-  firePath<-"/home/ubuntu/fwas_data/NIFC/incidents.csv"
-  
-#}
+#Universal Paths
+radarURL<-"https://radar.weather.gov/ridge/Conus/RadarImg/latest_radaronly.gif"
+
+#Deployment Paths
+inputFile<-"/home/ubuntu/src/nuwx/shiny/data/" #General Data Path
+runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py" #Server File Locaiton
+punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py" #Time zone detector file location
+firePath<-"/home/ubuntu/fwas_data/NIFC/incidents.csv"
+colorFile<-"/home/ubuntu/src/FWAS/data/colors.csv"
+radarFile<-"/ubuntu/src/nuwx/radar/conus_radar.gif"
+
+
 if(Sys.getenv("USER")[1]=="tanner") #Development
 {
   inputFile<-"/home/tanner/src/nu-weather/RAWS-Locator/shiny/data/"
   runPath<-"/home/tanner/src/nu-weather/RAWS-Locator/backend/meso-server.py"
   punWrath<-"/home/tanner/src/src2/web_timeZoneFinder/tz-detector.py"
   firePath<-"/media/tanner/vol2/NIFC/incidents.csv"
+  colorFile<-"/media/tanner/vol2/NCR/colors.csv"
+  radarFile<-"/media/tanner/vol2/RADAR/conus_radar.gif"
 }
 
 # Define server logic required to draw a histogram
@@ -80,7 +88,7 @@ shinyServer(function(input, output,session) {
   #####################################################
   observeEvent(input$mymap_click,
                {
-                 print("test")
+                 # print("test")
                  print(input$mymap_click$lat)
                  print(input$mymap_click$lng)
                  clickLat=input$mymap_click$lat
@@ -99,7 +107,7 @@ shinyServer(function(input, output,session) {
                          targs=paste("\"",clickLat,"\" \"",clickLon,"\"",sep="")
                          #print(targs)
                          tz_check<-system2(command=punWrath,args=targs,stdout = TRUE)
-                         #print(tz_check)
+                         # print(tz_check)
                          updateSelectInput(session,"timeZone",selected=tz_check)
                          
                        })
@@ -182,9 +190,19 @@ shinyServer(function(input, output,session) {
     
     clickLat=input$mymap_click$lat
     clickLon=input$mymap_click$lng
+    
+    if(is.null(input$mymap_click$lat))
+    {
+      clickLat=46.92
+    }
+    if(is.null(input$mymap_click$lng))
+    {
+      clickLon=-114.1
+    }
+    
     xmap<-leafletProxy("mymap")
     xmap%>%clearMarkers()
-    
+
     if(input$locationType==1)
     {
       gArgs=paste("\"",clickLat,"\" \"",clickLon,"\" \"",input$radius,"\" \"",input$timeZone,"\"",sep="")
@@ -255,6 +273,41 @@ shinyServer(function(input, output,session) {
         addCircleMarkers(xLon,xLat,popup="Entered Location",color="red") %>%
         setView(lng=xLon,lat=xLat,zoom=8)
     }
+
+    if(input$radarInput==TRUE)
+    {
+      download.file(radarURL,radarFile)
+      colorData<-read.csv(colorFile,header=FALSE)
+      hexList<-c()
+  
+      radarRaster <-raster(radarFile)
+      # xRadarRaster<-reactiveFileReader(1000,NULL,radarFile,raster)
+      # radarRaster<-xRadarRaster()
+      crs(radarRaster) <- sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+  
+      for(i in 0:nrow(colorData))
+      {
+        hV<-rgb(colorData[i:i,2:4],maxColorValue=255)
+        hexList[i]<-hV
+      }
+      xmap%>%addRasterImage(radarRaster,opacity=0.8,colors=hexList,group="Radar")
+      xmap%>%addLayersControl(
+        overlayGroups=(c("Radar"))
+      )
+    }
+    updateCollapse(session,"collapser",close = "RAWS")
+    
+    # colorData<-read.csv("/home/tanner/src/nu-weather/RAWS-Locator/radar/colors.csv",header=FALSE)
+    # 
+    # yr <-raster("/home/tanner/src/nu-weather/RAWS-Locator/radar/conus_radar.gif")
+    # crs(yr) <- sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+    # hexList<-c()
+    # for(i in 0:nrow(colorData))
+    # {
+    #   hV<-rgb(colorData[i:i,2:4],maxColorValue=255)
+    #   hexList[i]<-hV
+    # }
+    # xmap%>%addRasterImage(yr,opacity=0.8,colors=hexList)
     
     
   })

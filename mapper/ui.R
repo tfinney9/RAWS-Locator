@@ -13,6 +13,7 @@ library(leaflet)
 library(shinyjs)
 library(shinythemes)
 library(shinyBS)
+library(raster)
 
 jsCode<-'shinyjs.func = function(){ navigator.geolocation.getCurrentPosition(onSuccess, onError);
                                       function onError (err) {
@@ -45,12 +46,13 @@ shinyUI(bootstrapPage(theme=shinytheme("flatly"),
                                             selected=1,inline=TRUE),
                     uiOutput("location"),
                     sliderInput("radius", label = ("Observations Radius: (miles)"), min = 1,
-                                max = 50, value = 5),
+                                max = 100, value = 5),
                     selectInput("timeZone",label=("Select Time Zone"),choices=list("Pacific"=1,"Mountain"=2,
                                                                                    "Arizona"=3,"Central"=4,"Eastern"=5,
                                                                                    "Hawaii"=6,"Alaska"=7)),
-                    actionButton("run_app",label="Go!",class="btn-primary"),
-                    style="default"
+                  checkboxInput("radarInput","Display Base Reflectivity"),
+                  actionButton("run_app",label="Go!",class="btn-primary"),
+                  style="default"
         )
       )
     )
