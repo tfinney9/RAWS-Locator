@@ -21,7 +21,7 @@ runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py" #Server File Locaiton
 punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py" #Time zone detector file location
 firePath<-"/home/ubuntu/fwas_data/NIFC/incidents.csv"
 colorFile<-"/home/ubuntu/src/FWAS/data/colors.csv"
-radarFile<-"/ubuntu/src/nuwx/radar/conus_radar.gif"
+radarFile<-"/home/ubuntu/src/nuwx/radar/conus_radar.gif"
 
 
 if(Sys.getenv("USER")[1]=="tanner") #Development
