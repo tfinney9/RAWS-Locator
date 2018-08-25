@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 """
 Created on Tue May 29 11:29:39 2018
@@ -38,4 +38,4 @@ def setID(lat,lon):
 arg_lat=float(sys.argv[1])
 arg_lon=float(sys.argv[2])
 
-print setID(arg_lat,arg_lon)
+print(setID(arg_lat,arg_lon))

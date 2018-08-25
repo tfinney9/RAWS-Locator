@@ -40,7 +40,7 @@ def getRAWSData(Lat,Lon,Radius,limit,spdUnits,tempUnits):
     Internal RAWS fetcher. Uses Mesowest API
     """
     url=mwlatest.latlonBuilder(mwlatest.dtoken,str(Lat),str(Lon),str(Radius),"",
-    "relative_humidity,air_temp,wind_speed,wind_direction,wind_gust",
+    "relative_humidity,air_temp,wind_speed,wind_direction,wind_gust,precip_accum_one_hour",
     "",str(spdUnits),str(tempUnits))
     response=mwlatest.readData(url)
     return response

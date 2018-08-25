@@ -29,6 +29,8 @@ class Station:
     utc_offset=''
     is_empty=True
     name=''
+    
+    precip = 0.0 # inches of recent precip
 
 def printStation(station):
     """
