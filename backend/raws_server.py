@@ -19,7 +19,7 @@ import RAWS
 
 if getpass.getuser()=='tanner':
     tDir='/home/tanner/src/nu-weather/RAWS-Locator/shiny/data/'
-if getpass.getuser()=='tfinney':
+elif getpass.getuser()=='tfinney':
     tDir='/home/tfinney/src/fs/nu-weather/RAWS-Locator/shiny/data/'
 else:
     tDir='/srv/shiny-server/raws/raws-table/data/'
@@ -70,7 +70,7 @@ def runLocator(Lat,Lon,radius,tzID):
     Location=[Lat,Lon]
     
     weatherData = getRAWSData(Location[0],Location[1],radius)
-    wxStations = RAWS.checkStationData(weatherData,timeZone[0],Location)
+    wxStations = RAWS.checkStationData(weatherData,timeZone[0],Location,radius)
     
     for i in range(len(wxStations)):
         wxStations[i].name=wxStations[i].name.replace(',','')
@@ -85,12 +85,12 @@ def runLocator(Lat,Lon,radius,tzID):
                 sub = wxStations[i]
                 fStr = str(sub.name)+','+\
                 str(sub.stid)+','+\
-                str(sub.temperature)+','+\
+                str(round(sub.temperature,1))+','+\
                 str(round(sub.windSpeed,1))+','+\
                 str(round(sub.windGust,1))+','+\
                 str(round(sub.windDirection,1))+','+\
                 str(round(sub.rh,1))+','+\
-                str(round(sub.precip,1))+','+\
+                str(sub.precip)+','+\
                 str(round(sub.distance_from_point,1))+','+\
                 str(sub.cardinal)+','+\
                 str(sub.date)+','+\

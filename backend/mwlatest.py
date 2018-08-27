@@ -58,6 +58,7 @@ def latlonBuilder(token,lat,lon,radius,limit,svar,within,spdUnits,tempUnits):
     units=unitsBase+units+"metric"
   
     url=baseurl+stidfull+svarfull+"&status=active"+"&network=1,2"+units+timesand+tokfull
+#    url=baseurl+stidfull+svarfull+"&status=active"+units+timesand+tokfull    
     return url
     
 def readData(url):
@@ -68,12 +69,23 @@ def readData(url):
     return a
     
     
+def getRAWSData(Lat,Lon,Radius):
+    """
+    used mesonet api from mwlatest to fetch 
+    weather station data
+    """
+    url=latlonBuilder(dtoken,
+                               str(Lat),str(Lon),str(Radius),"",
+#    "relative_humidity,air_temp,wind_speed,wind_direction,wind_gust,precip_accum_one_hour",
+   "",
+    "","english","english")
+    response=readData(url)
+    return response
     
     
     
-    
-    
-    
+#a = getRAWSData(47,-114,30)
+#b = a['STATION']
     
     
     

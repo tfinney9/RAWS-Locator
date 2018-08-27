@@ -11,6 +11,7 @@ import numpy
 import dateutil.tz
 from geopy.distance import great_circle
 import math
+import PRECIP
 
 
 class wxStation():
@@ -171,7 +172,17 @@ def parseObservationTime(observation_time,tz):
     
     return [utc,local]
 
-def checkStationData(station_json,timeZone,location):
+
+def fetchPrecipData(location,radius,stationList):
+    precipData = PRECIP.precip(location[0],location[1],radius)
+    if(len(precipData.json_data['STATION'])==len(stationList)):     
+        for i in range(len(stationList)):
+            if(precipData.json_data['STATION'][i]['STID']==stationList[i].stid):
+                stationList[i].precip = precipData.json_data['STATION'][i]['OBSERVATIONS']['total_precip_value_1']
+#                print(stationList[i].stid)
+
+
+def checkStationData(station_json,timeZone,location,radius):
     """
     Convert station data in json format to an object
     """
@@ -207,20 +218,35 @@ def checkStationData(station_json,timeZone,location):
         if(stationValidity>0):
             station.valid_station = True
             stationList.append(station)
-        
+            
+    fetchPrecipData(location,radius,stationList)
     return stationList
 
 
 
 
 #Debug code   
-#testData = raws_server.getRAWSData(47,-114,15)
-#dd=checkStationData(testData,"America/Denver",[47,-114])
+#import mwlatest
+#def getRAWSData(Lat,Lon,Radius):
+#    """
+#    used mesonet api from mwlatest to fetch 
+#    weather station data
+#    """
+#    url=mwlatest.latlonBuilder(mwlatest.dtoken,
+#                               str(Lat),str(Lon),str(Radius),"",
+#    "relative_humidity,air_temp,wind_speed,wind_direction,wind_gust,precip_accum_one_hour",
+#    "","english","english")
+#    response=mwlatest.readData(url)
+#    return response
+##
 #
+#testData = getRAWSData(47,-114,15)
+#dd=checkStationData(testData,"America/Denver",[47,-114],15)
+###
 #for i in range(len(dd)):
 #    dd[i].printStation()
 #    print("\n")
-    
+#    
     
     
     

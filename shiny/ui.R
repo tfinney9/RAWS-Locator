@@ -1,3 +1,13 @@
+#
+#==========================================================
+# RAWS Locator 2.0
+# Table with small map
+#==========================================================
+# 
+# 
+# 
+#
+
 library(shiny)
 library(shinyjs)
 library(shinythemes)
