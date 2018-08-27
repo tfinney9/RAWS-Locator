@@ -13,12 +13,12 @@ library(leaflet)
 
 #if(Sys.getenv("USER")[1]=="ubuntu") #We Are Deploying this on the server
 #{
-  # inputFile<-"/home/ubuntu/src/nuwx/shiny/data/" #General Data Path
-  # # runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py" #Server File Locaiton
-  # runPath<-"/home/ubuntu/src/nuwx/backend/raws_server.py" #Server File Locaiton
-  # locData<-read.csv(file="/home/ubuntu/src/nuwx/backend/loc.csv") #File Location List
-  # punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py" #Time zone detector file location
-  # firePath<-"/home/ubuntu/fwas_data/NIFC/incidents.csv"
+  inputFile<-"/home/ubuntu/src/nuwx/shiny/data/" #General Data Path
+  # runPath<-"/home/ubuntu/src/nuwx/backend/meso-server.py" #Server File Locaiton
+  runPath<-"/home/ubuntu/src/nuwx/backend/raws_server.py" #Server File Locaiton
+  locData<-read.csv(file="/home/ubuntu/src/nuwx/backend/loc.csv") #File Location List
+  punWrath<-"/home/ubuntu/src/nuwx/backend/tz-detector.py" #Time zone detector file location
+  firePath<-"/home/ubuntu/fwas_data/NIFC/incidents.csv"
 #}
 if(Sys.getenv("USER")[1]=="tanner") #Development
 {
